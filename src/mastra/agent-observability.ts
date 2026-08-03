@@ -1,13 +1,13 @@
-import { Mastra } from '@mastra/core'
+
 import { Observability } from '@mastra/observability'
 import { LangSmithExporter } from '@mastra/langsmith'
 import { _config } from '../config/config.js'
 
-export const mastra = new Mastra({
-  observability: new Observability({
+
+export const agentObservability = new Observability({
     configs: {
       langsmith: {
-        serviceName: 'research-agent',
+        serviceName: 'research-autonomous-agent',
         exporters: [
           new LangSmithExporter({
             apiKey: _config.LANGSMITH_API_KEY,
@@ -15,5 +15,4 @@ export const mastra = new Mastra({
         ],
       },
     },
-  }),
-})
+  })

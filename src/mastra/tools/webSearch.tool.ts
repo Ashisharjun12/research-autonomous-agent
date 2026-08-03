@@ -5,14 +5,14 @@ import axios from 'axios';
 
 
 //input schema
-const convertCurrencyInputSchema = z.object({
+const webSearchInputSchema = z.object({
     amount: z.number(),
     from: z.string(),
     to: z.string(),
-})
+})  
 
 //output schema
-const convertCurrencyOutputSchema = z.object({
+const webSearchOutputSchema = z.object({
     amount: z.number(),
     from: z.string(),
     to: z.string(),
@@ -20,7 +20,7 @@ const convertCurrencyOutputSchema = z.object({
 
 
 //execute function
-async function executeConvertCurrency(input: z.infer<typeof convertCurrencyInputSchema>, {abortSignal}:{abortSignal?: AbortSignal}) {
+async function executeWebSearch(input: z.infer<typeof webSearchInputSchema>, {abortSignal}:{abortSignal?: AbortSignal}) {
     const {amount, from, to} = input;
     const response = await axios.get(`https://api.exchangerate.host/convert?from=${from}&to=${to}&amount=${amount}`, {
         signal: abortSignal,
@@ -29,10 +29,10 @@ async function executeConvertCurrency(input: z.infer<typeof convertCurrencyInput
 }
 
 //tools
-export const convertCurrencyTool = createTool({
-    id: 'convert-currency',
-    description: 'Convert a currency to another currency',
-    inputSchema: convertCurrencyInputSchema,
-    outputSchema: convertCurrencyOutputSchema,
-    execute:executeConvertCurrency
+export const webSearchTool = createTool({
+    id: 'web-search',
+    description: 'Search the web for information',
+    inputSchema: webSearchInputSchema,
+    outputSchema: webSearchOutputSchema,
+    execute:executeWebSearch
 })

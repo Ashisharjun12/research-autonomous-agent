@@ -41,7 +41,7 @@ class App {
 
   private setupRoutes() {
     this.app.get("/health", (_req, res) => {
-      res.status(200).json({ message: "Job Backend is Live" });
+      res.status(200).json({ message: "Research Agent is Live" });
     });
 
     this.app.use(passport.initialize());
