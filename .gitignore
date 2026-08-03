@@ -141,6 +141,6 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
 
-#project files md
- *.POSTMAN.md
- *.PROJECT.md
+# Local docs — do not push
+POSTMAN.md
+PROJECT.md
