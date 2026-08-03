@@ -1,38 +1,29 @@
 import { createTool } from '@mastra/core/tools'
 import { z } from 'zod'
-import axios from 'axios';
+import { searchWeb } from '@/infrastructure/scraping/tavily.client.js'
 
-
-
-//input schema
-const webSearchInputSchema = z.object({
-    amount: z.number(),
-    from: z.string(),
-    to: z.string(),
-})  
-
-//output schema
-const webSearchOutputSchema = z.object({
-    amount: z.number(),
-    from: z.string(),
-    to: z.string(),
+const tavilySearchInputSchema = z.object({
+    query: z.string().describe('Search query'),
+    maxResults: z.number().min(1).max(10).optional().default(5),
 })
 
+const tavilySearchOutputSchema = z.object({
+    results: z.array(
+        z.object({
+            title: z.string(),
+            url: z.string(),
+            content: z.string().optional(),
+        }),
+    ),
+    answer: z.string().optional(),
+})
 
-//execute function
-async function executeWebSearch(input: z.infer<typeof webSearchInputSchema>, {abortSignal}:{abortSignal?: AbortSignal}) {
-    const {amount, from, to} = input;
-    const response = await axios.get(`https://api.exchangerate.host/convert?from=${from}&to=${to}&amount=${amount}`, {
-        signal: abortSignal,
-    });
-    return response.data;
-}
-
-//tools
-export const webSearchTool = createTool({
-    id: 'web-search',
-    description: 'Search the web for information',
-    inputSchema: webSearchInputSchema,
-    outputSchema: webSearchOutputSchema,
-    execute:executeWebSearch
+export const tavilySearchTool = createTool({
+    id: 'tavily-search',
+    description:
+        'Search the web for recent articles and sources. Returns titles, URLs, snippets, and an optional summary answer.',
+    inputSchema: tavilySearchInputSchema,
+    outputSchema: tavilySearchOutputSchema,
+    execute: async ({ query, maxResults }, { abortSignal }) =>
+        searchWeb(query, { maxResults, abortSignal }),
 })

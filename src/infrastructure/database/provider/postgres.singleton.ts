@@ -23,7 +23,7 @@ export class PostgresSingleton implements IDbProvider {
         if (!PostgresSingleton.instances.has(connectionString)) {
             PostgresSingleton.instances.set(
                 connectionString,
-                new PostgresSingleton(connectionString, schema),
+                new PostgresSingleton(connectionString,schema),
             );
         }
         return PostgresSingleton.instances.get(connectionString)!;

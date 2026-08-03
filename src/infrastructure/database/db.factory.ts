@@ -1,5 +1,5 @@
 import { _config } from "@/config/config.js";
-import * as mainSchema from "@/modules/auth/auth.schema.js";
+import * as schema from "@/db/schema.js";
 import { PostgresPoolSingleton } from "./provider/postgres-pool.singleton.js";
 import { PostgresSingleton } from "./provider/postgres.singleton.js";
 
@@ -14,7 +14,7 @@ class DbFactory {
     static getMainDatabase() {
         return PostgresSingleton.getInstance(
             requireUrl(_config.POSTGRES_DATABASE_URL, "POSTGRES_DATABASE_URL"),
-            mainSchema,
+            schema
         );
     }
 

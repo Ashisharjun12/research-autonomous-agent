@@ -1,9 +1,6 @@
 import { Agent } from '@mastra/core/agent'
-import { _config } from '../../config/config.js'
 import { researchMemory } from '../memory.js'
-// import { saveArtifactTool } from '../tools/save-artifact.tool.js'  // when R2 tool exists
-
-const model = _config.LLM_MODEL as string
+import { agentModel } from '../model.js'
 
 export const reportWriterAgent = new Agent({
   id: 'report-writer-agent',
@@ -15,7 +12,7 @@ export const reportWriterAgent = new Agent({
   sections with headings, citations, and conclusion.
     Use only information provided in the delegation prompt.
   `,
-  model,
+  model: agentModel,
   memory: researchMemory,
   // tools: { saveArtifactTool },  // Phase 2 when R2 tool is ready
 })

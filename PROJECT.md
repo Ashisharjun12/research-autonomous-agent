@@ -276,18 +276,43 @@ Correlate via `threadId` / `runId` in log context.
 
 ---
 
-## 7. Universal gateway (OpenRouter)
+## 7. Universal gateway (OpenAI-compatible API)
 
-Implemented as `UniversalGateway` in `mastra/gateway.ts`, routing:
+Implemented as `UniversalGateway` in `mastra/gateway.ts` + `mastra/model.ts`, routing any OpenAI-compatible provider through a single key and base URL.
 
-- `LLM_BASE_URL` — OpenRouter API base
-- `LLM_API_KEY` — API key
-- `LLM_MODEL` — default model
+### Environment
+
+| Variable | Purpose |
+|----------|---------|
+| `LLM_BASE_URL` | API base (e.g. `https://openrouter.ai/api/v1`) |
+| `LLM_API_KEY` | Single API key for that base URL |
+| `LLM_MODEL` | Provider model id for text agents (e.g. `openai/gpt-4o-mini`) |
+| `LLM_TOOL_MODEL` | Optional — tool-capable model for web-search, document-reader, orchestrator |
+| `GUARDRAIL_MODEL` | Optional — PII detector model |
+
+**Do not set** provider-specific keys (`OPENAI_API_KEY`, `MINIMAX_API_KEY`, etc.).
+
+### How agents resolve models
+
+Agents never use raw `LLM_MODEL`. They import from `mastra/model.ts`:
+
+- `agentModel` → `universal/main/{LLM_MODEL}` (summarizer, report writer)
+- `toolAgentModel` → `universal/main/{LLM_TOOL_MODEL or LLM_MODEL}` (orchestrator, tool agents)
+- `guardrailModel` → `universal/main/{GUARDRAIL_MODEL or LLM_MODEL}`
+
+Mastra routes `universal/main/openai/gpt-4o-mini` through UniversalGateway, which calls `LLM_BASE_URL` with model id `openai/gpt-4o-mini` and `LLM_API_KEY`.
+
+### Reuse in future projects
+
+1. Copy `mastra/gateway.ts` and `mastra/model.ts`
+2. Register `universalGateway` in `mastra/index.ts` under `gateways`
+3. Agents import `agentModel` / `toolAgentModel` — never `_config.LLM_MODEL` directly
+4. Tool agents require models with `tools` support on your provider (check OpenRouter model page)
 
 ### Rules
 
 - Gateway is the **only** LLM entry point — no direct SDK calls in modules.
-- Phase 3: add a second model entry or per-sub-agent model override (fast model for search/planning, stronger model for writing).
+- Phase 3: add per-sub-agent model overrides (fast model for search, stronger for writing).
 
 ---
 
@@ -499,9 +524,10 @@ sequenceDiagram
 | `PORT` | No | HTTP port (default `8080`) |
 | `POSTGRES_DATABASE_URL` | Yes | Main app database (Drizzle) |
 | `AI_DATABASE_URL` | Yes | Mastra storage database (Postgres) |
-| `LLM_BASE_URL` | Yes | OpenRouter API base URL |
-| `LLM_API_KEY` | Yes | OpenRouter API key |
-| `LLM_MODEL` | Yes | Default LLM model id |
+| `LLM_BASE_URL` | Yes | OpenAI-compatible API base URL |
+| `LLM_API_KEY` | Yes | API key for `LLM_BASE_URL` |
+| `LLM_MODEL` | Yes | Provider model id (text agents) |
+| `LLM_TOOL_MODEL` | No | Tool-capable model (orchestrator, tool agents) |
 | `LANGSMITH_API_KEY` | No | LangSmith tracing |
 | `LANGSMITH_URL` | No | Self-hosted LangSmith URL |
 | `TAVILY_API_KEY` | Yes (Phase 1) | Tavily web search |

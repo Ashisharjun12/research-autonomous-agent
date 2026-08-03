@@ -1,18 +1,14 @@
 import { Agent } from '@mastra/core/agent'
-import { _config } from '../../config/config.js'
-import { webSearchTool } from '../tools/webSearch.tool.js';
-
-
-const model = _config.LLM_MODEL as string
+import { toolAgentModel } from '../model.js'
+import { tavilySearchTool } from '../tools/webSearch.tool.js'
 
 export const webSearchAgent = new Agent({
     id: 'web-search-agent',
     name: 'Web Search Agent',
+    instructions: 'Search for sources using tavily-search. Return structured citations only.',
     description: 'Searches the web and returns titles, URLs, and snippets with citations.',
-    instructions: `Search for sources. Return structured citations only.`,
-    model: model,
+    model: toolAgentModel,
     tools: {
-        webSearchTool
+        tavilySearchTool,
     },
-
 })
